@@ -19,7 +19,7 @@ setup(name='oao24',
                         ],
       test_suite='test',
       package_data={
-          'oao24': ['data/*'],
+          'oao24': ['data/**/*'],
       },
       include_package_data=True,
       )
