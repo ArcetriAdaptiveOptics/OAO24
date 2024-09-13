@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(name='oao24',
@@ -13,6 +13,7 @@ setup(name='oao24',
       url='',
       license='MIT',
       keywords='adaptive optics',
+      packages=find_packages(),
       install_requires=["numpy",
                         "astropy",
                         ],
