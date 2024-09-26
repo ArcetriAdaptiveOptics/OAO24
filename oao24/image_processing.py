@@ -16,13 +16,16 @@ def make_master_image(raw_data_cube, background_image):
 
     Nframes = raw_data_cube.shape[-1]
 
+    # create the background master
+    master_background = np.median(np.atleast_3d(background_image), axis=-1)
+
     # display the background image
     plt.figure()
-    plt.imshow(background_image, vmin=0, vmax=2000)
-    # plt.imshow(background_image)
+    plt.imshow(master_background, vmin=0, vmax=2000)
+    # plt.imshow(master_background)
     plt.colorbar(label='ADU')
     plt.title("Background image")
-    print_roi_mean_values(background_image, label='Background')
+    print_roi_mean_values(master_background, label='Background')
 
     # display one frame of the raw data cube
     plt.figure()
@@ -31,13 +34,14 @@ def make_master_image(raw_data_cube, background_image):
     plt.title("Raw data image #0")
     print_roi_mean_values(raw_data_cube[:, :, 0], label='Raw image #0')
 
+
     # subtracting background from raw data
     # make sure new array is float !!! to avoid integer overflows
     background_subtracted_data_cube = np.zeros(
         raw_data_cube.shape, dtype=float)
     for frame in np.arange(Nframes):
         background_subtracted_data_cube[:, :,
-                                        frame] = raw_data_cube[:, :, frame] - background_image
+                                        frame] = raw_data_cube[:, :, frame] - master_background
 
     # Computing master image
     # Sum along the NDIT dimension to obtain a single (512,640) image
