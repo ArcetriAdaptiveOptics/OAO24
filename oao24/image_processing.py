@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from oao24 import package_data
 
 
-def make_master_image(raw_data_cube, background_image):
+def make_master_image(raw_data_cube, background_image, want_display=False):
     ''' 
     Compute the master image from a raw cube data and the background image.
     
@@ -18,22 +18,6 @@ def make_master_image(raw_data_cube, background_image):
 
     # create the background master
     master_background = np.median(np.atleast_3d(background_image), axis=-1)
-
-    # display the background image
-    plt.figure()
-    plt.imshow(master_background, vmin=0, vmax=2000)
-    # plt.imshow(master_background)
-    plt.colorbar(label='ADU')
-    plt.title("Background image")
-    print_roi_mean_values(master_background, label='Background')
-
-    # display one frame of the raw data cube
-    plt.figure()
-    plt.imshow(raw_data_cube[:, :, 0], vmin=0, vmax=2000)
-    plt.colorbar(label='ADU')
-    plt.title("Raw data image #0")
-    print_roi_mean_values(raw_data_cube[:, :, 0], label='Raw image #0')
-
 
     # subtracting background from raw data
     # make sure new array is float !!! to avoid integer overflows
@@ -53,22 +37,32 @@ def make_master_image(raw_data_cube, background_image):
     master_image = background_subtracted_data_cube.sum(axis=-1)
     print_roi_mean_values(master_image, label='Master image')
 
-    #########
-    # Check background subtraction is ok.
-    # Dark area should be around 0
-    ######
-    plt.figure()
-    plt.imshow(master_image, vmin=-10, vmax=100)
-    plt.title('Master image (linear scale, clipped)')
-    plt.colorbar()
+    if want_display:
+        plt.figure()
+        plt.imshow(master_background, vmin=0, vmax=2000)
+        plt.colorbar(label='ADU')
+        plt.title("Background image")
+        print_roi_mean_values(master_background, label='Background')
+
+        # display one frame of the raw data cube
+        plt.figure()
+        plt.imshow(raw_data_cube[:, :, 0], vmin=0, vmax=2000)
+        plt.colorbar(label='ADU')
+        plt.title("Raw data image #0")
+        print_roi_mean_values(raw_data_cube[:, :, 0], label='Raw image #0')
+
+        plt.figure()
+        plt.imshow(master_image, vmin=-10, vmax=100)
+        plt.title('Master image (linear scale, clipped)')
+        plt.colorbar()
 
     #########
-    # Display image
+    # Display image log scale
     # Dark area should be around 0
     ######
     plt.figure()
     arr = master_image
-    plt.imshow(np.log10(arr-np.median(arr)+1), cmap='inferno')
+    plt.imshow(np.log10(np.clip(arr, 0, None)+1), cmap='inferno')
     plt.title('Master image (log scale)')
     plt.colorbar()
 
